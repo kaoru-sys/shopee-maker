@@ -94,6 +94,13 @@ export default function TextSettings({ settings, setSettings }) {
                   style={{
                     left: `${settings.textPositionX}%`,
                     top: `${settings.textPositionY}%`,
+                    fontSize: `${Math.max(10, settings.fontSize / 7)}px`,
+                    fontWeight: settings.textBold ? 'bold' : 'normal',
+                    color: settings.textColor || '#141414',
+                    WebkitTextStroke: settings.textStroke ? '1px #ffffff' : 'none',
+                    textShadow: settings.textStroke
+                      ? '0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff'
+                      : '0 0 3px rgba(255,255,255,0.9)',
                   }}
                 >
                   Aa
