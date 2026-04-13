@@ -129,6 +129,22 @@ export default function App() {
       <footer className="app-footer">
         <p>Shopee 出品画像メーカー © 2026</p>
       </footer>
+
+      <div style={{
+        textAlign: "center",
+        padding: "20px",
+        marginTop: "24px",
+        borderTop: "1px solid #eee"
+      }}>
+        <img
+          src="/Liberta_2.jpg"
+          alt="Liberta Japan"
+          style={{ height: 40, opacity: 0.7 }}
+        />
+        <div style={{ fontSize: 11, color: "#bbb", marginTop: 6 }}>
+          Powered by Liberta Japan
+        </div>
+      </div>
     </div>
   );
 }
