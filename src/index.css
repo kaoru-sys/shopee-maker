@@ -517,6 +517,36 @@ body {
   transform: scale(0.95);
 }
 
+/* Position Preview Box */
+.position-preview-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.position-preview-inner {
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  border: 3px solid #d23c3c;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+
+.position-preview-dot {
+  position: absolute;
+  transform: translate(-50%, 0);
+  color: #d23c3c;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 3px rgba(255,255,255,0.9);
+  transition: left 0.1s, top 0.1s;
+}
+
 /* Slider Row */
 .slider-row {
   margin-bottom: 10px;

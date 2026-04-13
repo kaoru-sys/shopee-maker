@@ -79,9 +79,28 @@ export default function TextSettings({ settings, setSettings }) {
             </div>
           </div>
 
-          {/* Position Sliders */}
+          {/* Position Sliders with Preview */}
           <div className="setting-section">
             <h4>位置の微調整</h4>
+
+            {/* Mini preview box */}
+            <div className="position-preview-box">
+              <div className="position-preview-inner" style={{
+                borderColor: settings.showBorder ? (settings.borderColor || '#d23c3c') : '#ddd',
+                backgroundColor: settings.bgColor || '#fff',
+              }}>
+                <div
+                  className="position-preview-dot"
+                  style={{
+                    left: `${settings.textPositionX}%`,
+                    top: `${settings.textPositionY}%`,
+                  }}
+                >
+                  Aa
+                </div>
+              </div>
+            </div>
+
             <div className="slider-row">
               <label>X位置: {settings.textPositionX}%</label>
               <input
