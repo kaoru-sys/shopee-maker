@@ -56,6 +56,11 @@ export default function TemplateSettings({ settings, setSettings }) {
       showBorder: settings.showBorder,
       backgroundImage: settings.backgroundImage || null,
       customIcon: settings.customIcon || null,
+      textPositionX: settings.textPositionX,
+      textPositionY: settings.textPositionY,
+      fontSize: settings.fontSize,
+      textBold: settings.textBold,
+      textStroke: settings.textStroke,
     };
 
     // Check size limits
@@ -93,6 +98,11 @@ export default function TemplateSettings({ settings, setSettings }) {
       showBorder: template.showBorder,
       backgroundImage: template.backgroundImage || null,
       customIcon: template.customIcon || null,
+      textPositionX: template.textPositionX ?? prev.textPositionX,
+      textPositionY: template.textPositionY ?? prev.textPositionY,
+      fontSize: template.fontSize ?? prev.fontSize,
+      textBold: template.textBold ?? prev.textBold,
+      textStroke: template.textStroke ?? prev.textStroke,
     }));
   };
 

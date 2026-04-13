@@ -13,6 +13,11 @@ export async function renderCanvas(canvas, options) {
     showBorder = true,
     backgroundImage = null,
     customIcon = null,
+    textPositionX = 50,
+    textPositionY = 8,
+    fontSize: userFontSize = 100,
+    textBold = true,
+    textStroke = false,
   } = options;
 
   canvas.width = CANVAS_SIZE;
@@ -41,27 +46,62 @@ export async function renderCanvas(canvas, options) {
   }
 
   // Draw title
-  const titleAreaTop = MARGIN + (showBorder && !backgroundImage ? borderWidth : 0) + 20;
-  let titleBottom = titleAreaTop;
-  if (title) {
-    ctx.fillStyle = textColor;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
+  const borderOffset = showBorder && !backgroundImage ? borderWidth : 0;
+  const innerLeft = MARGIN + borderOffset;
+  const innerTop = MARGIN + borderOffset;
+  const innerWidth = CANVAS_SIZE - (MARGIN + borderOffset) * 2;
+  const innerHeight = CANVAS_SIZE - (MARGIN + borderOffset) * 2;
 
-    const maxWidth = CANVAS_SIZE - (MARGIN + 40) * 2;
-    let fontSize = 100;
-    const minFontSize = 28;
+  // Calculate title position for image layout (fallback)
+  const titleAreaTop = innerTop + 20;
+  let titleBottom = titleAreaTop;
+
+  if (title) {
+    const maxWidth = innerWidth - 40;
+    let fontSize = userFontSize;
+    const minFontSize = 24;
+    const fontWeight = textBold ? 'bold' : 'normal';
 
     while (fontSize >= minFontSize) {
-      ctx.font = `bold ${fontSize}px "Segoe UI", Tahoma, sans-serif`;
+      ctx.font = `${fontWeight} ${fontSize}px "Segoe UI", Tahoma, sans-serif`;
       const metrics = ctx.measureText(title);
       if (metrics.width <= maxWidth) break;
       fontSize -= 2;
     }
 
-    ctx.font = `bold ${fontSize}px "Segoe UI", Tahoma, sans-serif`;
-    ctx.fillText(title, CANVAS_SIZE / 2, titleAreaTop, maxWidth);
-    titleBottom = titleAreaTop + fontSize + 20;
+    ctx.font = `${fontWeight} ${fontSize}px "Segoe UI", Tahoma, sans-serif`;
+    ctx.textBaseline = 'top';
+
+    // Determine textAlign from X position
+    let textAlign;
+    let textX;
+    if (textPositionX < 33) {
+      textAlign = 'left';
+      textX = innerLeft + (innerWidth * textPositionX / 100);
+    } else if (textPositionX > 66) {
+      textAlign = 'right';
+      textX = innerLeft + (innerWidth * textPositionX / 100);
+    } else {
+      textAlign = 'center';
+      textX = innerLeft + (innerWidth * textPositionX / 100);
+    }
+    ctx.textAlign = textAlign;
+
+    const textY = innerTop + (innerHeight * textPositionY / 100);
+
+    // Stroke (outline)
+    if (textStroke) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(title, textX, textY, maxWidth);
+    }
+
+    // Fill
+    ctx.fillStyle = textColor;
+    ctx.fillText(title, textX, textY, maxWidth);
+
+    titleBottom = textY + fontSize + 20;
   }
 
   // Draw product images

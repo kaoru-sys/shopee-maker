@@ -486,6 +486,78 @@ body {
   margin-bottom: 10px;
 }
 
+/* Position Grid (3x3) */
+.position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-width: 140px;
+}
+
+.position-btn {
+  width: 42px;
+  height: 42px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s;
+}
+
+.position-btn.active {
+  background: #d23c3c;
+  border-color: #d23c3c;
+}
+
+.position-btn:active {
+  transform: scale(0.95);
+}
+
+/* Slider Row */
+.slider-row {
+  margin-bottom: 10px;
+}
+
+.slider-row label {
+  font-size: 14px;
+  color: #555;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.slider-row input[type="range"] {
+  margin-top: 2px;
+}
+
+/* Toggle Buttons */
+.toggle-row {
+  display: flex;
+  gap: 10px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.toggle-btn.active {
+  background: #d23c3c;
+  color: #fff;
+  border-color: #d23c3c;
+}
+
 /* Footer */
 .app-footer {
   text-align: center;

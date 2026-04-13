@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import ImageUploader from './components/ImageUploader';
 import BackgroundRemover from './components/BackgroundRemover';
 import TemplateSettings from './components/TemplateSettings';
+import TextSettings from './components/TextSettings';
 import BatchMode from './components/BatchMode';
 import { renderCanvas } from './utils/canvasRenderer';
 import './App.css';
@@ -14,6 +15,11 @@ const DEFAULT_SETTINGS = {
   showBorder: true,
   backgroundImage: null,
   customIcon: null,
+  textPositionX: 50,
+  textPositionY: 8,
+  fontSize: 100,
+  textBold: true,
+  textStroke: false,
 };
 
 export default function App() {
@@ -94,6 +100,9 @@ export default function App() {
               placeholder="例: Demon Slayer Figure"
             />
           </div>
+
+          {/* Text Settings */}
+          <TextSettings settings={settings} setSettings={setSettings} />
 
           {/* Image Uploader */}
           <ImageUploader images={images} setImages={setImages} />
