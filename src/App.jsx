@@ -87,6 +87,9 @@ export default function App() {
       {/* Template Settings (shared) */}
       <TemplateSettings settings={settings} setSettings={setSettings} />
 
+      {/* Text Settings (shared) */}
+      <TextSettings settings={settings} setSettings={setSettings} />
+
       {mode === 'normal' ? (
         <>
           {/* Title Input */}
@@ -100,9 +103,6 @@ export default function App() {
               placeholder="例: Demon Slayer Figure"
             />
           </div>
-
-          {/* Text Settings */}
-          <TextSettings settings={settings} setSettings={setSettings} />
 
           {/* Image Uploader */}
           <ImageUploader images={images} setImages={setImages} />
