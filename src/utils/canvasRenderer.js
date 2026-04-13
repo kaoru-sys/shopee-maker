@@ -1,5 +1,3 @@
-import { drawJapanIcon } from './japanIcon';
-
 const CANVAS_SIZE = 1080;
 const MARGIN = 30;
 const ICON_SIZE = 140;
@@ -153,8 +151,6 @@ export async function renderCanvas(canvas, options) {
   if (customIcon) {
     const iconImg = await loadImage(customIcon);
     ctx.drawImage(iconImg, iconX, iconY, ICON_SIZE, ICON_SIZE);
-  } else {
-    drawJapanIcon(ctx, iconX, iconY, ICON_SIZE);
   }
 
   return canvas;
