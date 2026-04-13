@@ -1,16 +1,13 @@
 import { useState, useRef } from 'react';
 import { renderCanvas } from '../utils/canvasRenderer';
 
-export default function BatchMode({ settings }) {
-  const [titles, setTitles] = useState('');
-  const [images, setImages] = useState([]);
-  const [generating, setGenerating] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0 });
-  const [results, setResults] = useState([]);
+function ProductCard({ index, product, onUpdate, onRemove, canRemove }) {
   const fileInputRef = useRef(null);
 
   const handleFiles = (files) => {
-    const promises = Array.from(files).map(file => {
+    const remaining = 6 - product.images.length;
+    const newFiles = Array.from(files).slice(0, remaining);
+    const promises = newFiles.map(file => {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
@@ -18,34 +15,115 @@ export default function BatchMode({ settings }) {
       });
     });
     Promise.all(promises).then(dataUrls => {
-      setImages(prev => [...prev, ...dataUrls]);
+      onUpdate(index, { ...product, images: [...product.images, ...dataUrls] });
     });
   };
 
+  const removeImage = (imgIndex) => {
+    onUpdate(index, {
+      ...product,
+      images: product.images.filter((_, i) => i !== imgIndex),
+    });
+  };
+
+  return (
+    <div className="card" style={{ border: '2px solid #f0e0e0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <h3 style={{ margin: 0 }}>📦 商品 {index + 1}</h3>
+        {canRemove && (
+          <button
+            className="btn-tiny btn-tiny-danger"
+            onClick={() => onRemove(index)}
+          >
+            🗑 削除
+          </button>
+        )}
+      </div>
+
+      <input
+        type="text"
+        className="title-input"
+        value={product.title}
+        onChange={e => onUpdate(index, { ...product, title: e.target.value })}
+        placeholder={`商品${index + 1}のタイトル（英語）`}
+        style={{ marginBottom: 10 }}
+      />
+
+      <div
+        className="drop-zone"
+        style={{ padding: '16px' }}
+        onClick={() => fileInputRef.current?.click()}
+        onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
+        onDragOver={(e) => e.preventDefault()}
+      >
+        <p style={{ margin: 0, fontSize: 13 }}>
+          画像を追加（最大6枚）{product.images.length > 0 && ` - ${product.images.length}枚選択中`}
+        </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: 'none' }}
+          onChange={(e) => { handleFiles(e.target.files); e.target.value = ''; }}
+        />
+      </div>
+
+      {product.images.length > 0 && (
+        <div className="thumbnail-grid" style={{ marginTop: 8 }}>
+          {product.images.map((src, i) => (
+            <div key={i} className="thumbnail-item">
+              <img src={src} alt={`画像${i + 1}`} />
+              <button className="thumbnail-remove" onClick={() => removeImage(i)}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function BatchMode({ settings }) {
+  const [products, setProducts] = useState([{ title: '', images: [] }]);
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [results, setResults] = useState([]);
+
+  const addProduct = () => {
+    setProducts(prev => [...prev, { title: '', images: [] }]);
+  };
+
+  const updateProduct = (index, product) => {
+    setProducts(prev => prev.map((p, i) => i === index ? product : p));
+  };
+
+  const removeProduct = (index) => {
+    setProducts(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleGenerate = async () => {
-    const titleList = titles.split('\n').map(t => t.trim()).filter(Boolean);
-    if (titleList.length === 0) {
-      alert('商品タイトルを入力してください');
+    const validProducts = products.filter(p => p.title.trim());
+    if (validProducts.length === 0) {
+      alert('少なくとも1つの商品タイトルを入力してください');
       return;
     }
 
     setGenerating(true);
-    setProgress({ current: 0, total: titleList.length });
+    setProgress({ current: 0, total: validProducts.length });
     const generatedResults = [];
 
-    for (let i = 0; i < titleList.length; i++) {
-      setProgress({ current: i + 1, total: titleList.length });
+    for (let i = 0; i < validProducts.length; i++) {
+      setProgress({ current: i + 1, total: validProducts.length });
       const canvas = document.createElement('canvas');
-      const productImages = images[i] ? [images[i]] : [];
 
       await renderCanvas(canvas, {
-        title: titleList[i],
-        images: productImages,
+        title: validProducts[i].title,
+        images: validProducts[i].images,
         ...settings,
       });
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      generatedResults.push({ title: titleList[i], blob });
+      generatedResults.push({ title: validProducts[i].title, blob });
     }
 
     setResults(generatedResults);
@@ -73,54 +151,28 @@ export default function BatchMode({ settings }) {
     URL.revokeObjectURL(url);
   };
 
-  const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-
   return (
     <div>
-      <div className="card">
-        <h3>📝 商品タイトル一覧</h3>
-        <textarea
-          className="batch-textarea"
-          value={titles}
-          onChange={e => setTitles(e.target.value)}
-          placeholder={"1行に1つタイトルを入力\n例:\nDemon Slayer\nTamagotchi\nPokemon"}
-          rows={6}
-        />
-      </div>
-
-      <div className="card">
-        <h3>📷 商品画像（タイトル順に割り当て）</h3>
-        <div
-          className="drop-zone"
-          onClick={() => fileInputRef.current?.click()}
-          onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
-          onDragOver={(e) => e.preventDefault()}
-        >
-          <p>タップして画像を選択</p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            style={{ display: 'none' }}
-            onChange={(e) => { handleFiles(e.target.files); e.target.value = ''; }}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {products.map((product, i) => (
+          <ProductCard
+            key={i}
+            index={i}
+            product={product}
+            onUpdate={updateProduct}
+            onRemove={removeProduct}
+            canRemove={products.length > 1}
           />
-        </div>
-
-        {images.length > 0 && (
-          <div className="thumbnail-grid">
-            {images.map((src, i) => (
-              <div key={i} className="thumbnail-item">
-                <img src={src} alt={`画像${i + 1}`} />
-                <button className="thumbnail-remove" onClick={() => removeImage(i)}>✕</button>
-                <span className="thumbnail-label">{i + 1}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        ))}
       </div>
+
+      <button
+        className="btn btn-outline"
+        onClick={addProduct}
+        style={{ width: '100%', marginTop: 12, marginBottom: 12 }}
+      >
+        ＋ 商品を追加
+      </button>
 
       <button
         className="btn btn-primary"
